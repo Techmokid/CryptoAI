@@ -6,7 +6,7 @@ namespace CryptoAI {
     /// <summary>
     /// Used for logging to the console. This could be adapted later for writing to files and filtering logs.
     /// </summary>
-    public class Log {
+    public static class Log {
         public static bool PrintTime = true;
         public static bool PrintModule = false;
 
