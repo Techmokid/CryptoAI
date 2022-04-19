@@ -40,6 +40,7 @@ namespace CryptoAI {
 		static double trainingWanderVariable = 1.0;
 		
 		public struct Genome_GPU {
+			public Genome_GPU() { }
 			public int ID = -1;
 			public double fitness = -99999;
 			public double prev_fitness = -99999;
@@ -48,6 +49,7 @@ namespace CryptoAI {
 		}
 		
 		public struct Node_GPU {
+			public Node_GPU() { }
 			public int nAT = -1;		//node Activation Type		// 0 is classic. 1 is neural
 			public int ID = -1;			//Identification code		// The ID of this node
 			
