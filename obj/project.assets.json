@@ -5453,11 +5453,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\aj200\\Documents\\GitHub\\My-Projects\\Active Projects\\GPU AI\\GPU AI.csproj",
+      "projectUniqueName": "C:\\Users\\aj200\\Documents\\GitHub\\CryptoAI\\CryptoAI\\GPU AI.csproj",
       "projectName": "GPU AI",
-      "projectPath": "C:\\Users\\aj200\\Documents\\GitHub\\My-Projects\\Active Projects\\GPU AI\\GPU AI.csproj",
+      "projectPath": "C:\\Users\\aj200\\Documents\\GitHub\\CryptoAI\\CryptoAI\\GPU AI.csproj",
       "packagesPath": "C:\\Users\\aj200\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\aj200\\Documents\\GitHub\\My-Projects\\Active Projects\\GPU AI\\obj\\",
+      "outputPath": "C:\\Users\\aj200\\Documents\\GitHub\\CryptoAI\\CryptoAI\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"

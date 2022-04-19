@@ -41,9 +41,9 @@ namespace CryptoAI {
 			AI.NewNetworkGPU(100,150,300,6,2);
 			AI_GPU.trainingData = API.allCoinsData;
 			List<double[]> results = AI.GetNetworkOutput(AI_GPU.trainingData[0]);
-			for(int i = 0; i < results.Count; i++) {
+			//for(int i = 0; i < results.Count; i++) {
 			//	Console.WriteLine("Genome " + i + ": " + results[i][0] + "\t\t\t" + results[i][1]);
-			}
+			//}
 			
 			AI.SaveNetworkGPU();
 			

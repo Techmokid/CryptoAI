@@ -1,1 +1,1 @@
-cd "C:\Users\aj200\Documents\GitHub\My-Projects\Active Projects\GPU AI" && dotnet build && dotnet run || pause
+cd "C:\Users\aj200\Documents\GitHub\CryptoAI\CryptoAI" && dotnet build && dotnet run || pause

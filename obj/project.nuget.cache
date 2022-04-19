@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "9OvieRidJwMWhIHcy0cCm6FTddtkIrSJMBpvbv8789+zy5kMYrqzNZmTYcTXat36QABnyaOyO4DGDfAVzK9XcA==",
+  "dgSpecHash": "xjcO8uYQMhhMGw2lzmTZTMdoXNyqChPXYnG2W+jYPukH4SMUhWoCPh1ARGvGa62jezPx4KTiVqwCLxUMGJUtEQ==",
   "success": true,
-  "projectFilePath": "C:\\Users\\aj200\\Documents\\GitHub\\My-Projects\\Active Projects\\GPU AI\\GPU AI.csproj",
+  "projectFilePath": "C:\\Users\\aj200\\Documents\\GitHub\\CryptoAI\\CryptoAI\\GPU AI.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\aj200\\.nuget\\packages\\communitytoolkit.diagnostics\\8.0.0-preview1\\communitytoolkit.diagnostics.8.0.0-preview1.nupkg.sha512",
     "C:\\Users\\aj200\\.nuget\\packages\\computesharp\\2.0.0-alpha.18\\computesharp.2.0.0-alpha.18.nupkg.sha512",
