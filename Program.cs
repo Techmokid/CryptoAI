@@ -14,14 +14,13 @@ namespace CryptoAI {
 		static void Main(string[] args) {
 			Console.Clear();
 			
-			NI.printTime = true;
-			NI.printModuleName = false;
-			NI.PrintFormattedMsg("CryptoAI","LOG","This is a logged message or generic output");
-			NI.PrintFormattedMsg("CryptoAI","DEBUG","This is debugging code output");
-			NI.PrintFormattedMsg("CryptoAI","WARNING","This is a warning that a function is having troubles");
-			NI.PrintFormattedMsg("CryptoAI","ERROR","This indicates something went very wrong");
-			NI.PrintFormattedMsg("CryptoAI","SUCCESS","This indicates that a function completed!");
-			NI.PrintFormattedMsg("CryptoAI","THING","This is a generic message that doesn't fit the other stuff");
+			Log.PrintTime = true;
+			Log.PrintModule = false;
+			Log.Print("CryptoAI","This is a logged message or generic output");
+			Log.Debug("CryptoAI","This is debugging code output");
+			Log.Warning("CryptoAI","This is a warning that a function is having troubles");
+			Log.Error("CryptoAI","This indicates something went very wrong");
+			Log.Success("CryptoAI","This indicates that a function completed!");
 			
 			Console.WriteLine();
 			Console.WriteLine();
@@ -30,10 +29,10 @@ namespace CryptoAI {
 			Console.WriteLine();
 			
 			//DisplayManager.StartDisplay();
-			NI.PrintFormattedMsg("CryptoAI","LOG","Starting...");
-			NI.PrintFormattedMsg("CryptoAI","LOG","Retrieving crypto data....");
+			Log.Print("CryptoAI","Starting...");
+			Log.Print("CryptoAI","Retrieving crypto data....");
 			API.UpdateAllCoinsData(300);
-			NI.PrintFormattedMsg("CryptoAI","SUCCESS","Retrieved all crypto data");
+			Log.Success("CryptoAI","Retrieved all crypto data");
 			
 			AI_GPU AI = new AI_GPU();
 			AI_GPU.saveDirectory = desktop + "Andrey AI/";
@@ -93,7 +92,7 @@ namespace CryptoAI {
 			//AI.SaveNetworkGPU("F:/GPU Crypto AI");
 			//AI.LoadNetworkGPU("F:/GPU Crypto AI");
 			
-			NI.PrintFormattedMsg("CryptoAI","SUCCESS","Completed network tests");
+			Log.Success("CryptoAI","Completed network tests");
 			while(true) {}
 		}
 	}

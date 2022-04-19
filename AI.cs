@@ -127,8 +127,8 @@ namespace CryptoAI {
 		
 		public void GetGenomeOutput(double[] inputValues, ref double[] outputValues) {
 			if (inputNodes.Length != inputValues.Count()) {
-				NetworkInterface.PrintFormattedMsg("CryptoAI","ERROR","Incorrect size of input array upon GetGenomeOutput()");
-				NetworkInterface.PrintFormattedMsg("CryptoAI","ERROR","Received " + inputValues.Count().ToString() +
+				Log.Error("CryptoAI","Incorrect size of input array upon GetGenomeOutput()");
+				Log.Error("CryptoAI","Received " + inputValues.Count().ToString() +
 								  " values, but was expecting " + inputNodes.Count().ToString());
 				NetworkInterface.quit();
 			}
@@ -174,7 +174,7 @@ namespace CryptoAI {
 		public static Genome LoadBestGenome() {
 			if (saveDirectory == "") {
 				Console.ForegroundColor = ConsoleColor.Red;
-				PrintFormattedMsg("CryptoAI","ERROR","Could not load best genome. LoadBestGenome was called without setting save directory");
+				Log.Error("CryptoAI","Could not load best genome. LoadBestGenome was called without setting save directory");
 				quit();
 			}
 			
@@ -191,35 +191,35 @@ namespace CryptoAI {
 				try {
 					int result = int.Parse(File.ReadAllText(netStatusFile));
 					if (result == 0) {
-						PrintFormattedMsg("AI Config","LOG","Loading best genome from primary save file");
+						Log.Print("AI Config","Loading best genome from primary save file");
 						loadDirectory = netSaveDir;
 					} else if (result == 1) {
-						PrintFormattedMsg("AI Config","WARNING","Primary save file corrupted. Loading best genome from backup save file");
+						Log.Warning("AI Config","Primary save file corrupted. Loading best genome from backup save file");
 						loadDirectory = netBackupDir;
 					} else if (result == 2) {
-						PrintFormattedMsg("AI Config","WARNING","Backup save file corrupted. Attempting file repair");
+						Log.Warning("AI Config","Backup save file corrupted. Attempting file repair");
 						saveFileRepair();
-						PrintFormattedMsg("AI Config","Log","Loading best genome from primary save file");
+						Log.Print("AI Config","Loading best genome from primary save file");
 						loadDirectory = netSaveDir;
 					} else {
-						PrintFormattedMsg("AI Config","ERROR","Invalid save status detected in save directory");
+						Log.Error("AI Config","Invalid save status detected in save directory");
 						quit();
 					}
 				} catch {
 					//null
-					PrintFormattedMsg("AI Config","WARNING","No save status detected. Loading best genome from primary save file");
+					Log.Warning("AI Config","No save status detected. Loading best genome from primary save file");
 					loadDirectory = netSaveDir;
 				}
 			} else {
-				PrintFormattedMsg("CryptoAI","WARNING","Could not find save status file. Using default option");
+				Log.Error("CryptoAI","Could not find save status file. Using default option");
 				if (Directory.Exists(netSaveDir)) {
-					PrintFormattedMsg("AI Config","LOG","Loading best genome from primary save file");
+					Log.Print("AI Config","Loading best genome from primary save file");
 					loadDirectory = netSaveDir;
 				} else if (Directory.Exists(netBackupDir)) {
-					PrintFormattedMsg("AI Config","LOG","Loading best genome from backup save file");
+					Log.Print("AI Config","Loading best genome from backup save file");
 					loadDirectory = netBackupDir;
 				} else {
-					PrintFormattedMsg("CryptoAI","ERROR","Could not load best genome. No save file detected in directory");
+					Log.Error("CryptoAI","Could not load best genome. No save file detected in directory");
 					quit();
 				}
 			}
@@ -227,8 +227,8 @@ namespace CryptoAI {
 			//Read from the text file to find which ID was best
 			string bestIDDirectory = loadDirectory + "Best Genome.txt";
 			if (!File.Exists(bestIDDirectory)) {
-				PrintFormattedMsg("CryptoAI","ERROR","Could not load best genome. Could not locate best genome ID file at position: ");
-				PrintFormattedMsg("CryptoAI","ERROR"," - " + bestIDDirectory);
+				Log.Error("CryptoAI","Could not load best genome. Could not locate best genome ID file at position: ");
+				Log.Error("CryptoAI"," - " + bestIDDirectory);
 				quit();
 			}
 			
@@ -301,7 +301,7 @@ namespace CryptoAI {
 				JObject rawGenomeData = (JObject)JsonConvert.DeserializeObject(File.ReadAllText(dir));
 				g.nodes = new Node[rawGenomeData.Count];
 				
-				PrintFormattedMsg("CryptoAI","ERROR","Could not complete loading network in dumpAndPump mode. W.I.P");
+				Log.Error("CryptoAI","Could not complete loading network in dumpAndPump mode. W.I.P");
 				quit();
 			}
 			
@@ -312,11 +312,11 @@ namespace CryptoAI {
 		public static Network LoadNetwork_MT() {
 			if (saveDirectory == "") {
 				Console.ForegroundColor = ConsoleColor.Red;
-				PrintFormattedMsg("CryptoAI","ERROR","Could not load network. LoadNetwork was called without setting save directory");
+				Log.Error("CryptoAI","Could not load network. LoadNetwork was called without setting save directory");
 				quit();
 			}
 			
-			PrintFormattedMsg("AI Config","WARNING","Loading AI network can take several minutes...");
+			Log.Warning("AI Config","Loading AI network can take several minutes...");
 			
 			string netSaveDir = saveDirectory + "Network Save Orig/";
 			string netBackupDir = saveDirectory + "Network Save Backup/";
@@ -331,39 +331,39 @@ namespace CryptoAI {
 				try {
 					int result = int.Parse(File.ReadAllText(netStatusFile));
 					if (result == 0) {
-						PrintFormattedMsg("AI Config","LOG","Loading AI network from primary save");
+						Log.Print("AI Config","Loading AI network from primary save");
 						loadDirectory = netSaveDir;
 					} else if (result == 1) {
-						PrintFormattedMsg("AI Config","WARNING","Primary save corrupted. Attempting file repair");
+						Log.Warning("AI Config","Primary save corrupted. Attempting file repair");
 						saveFileRepair();
-						PrintFormattedMsg("AI Config","Log","Loading AI network from backup save");
+						Log.Print("AI Config","Loading AI network from backup save");
 						loadDirectory = netBackupDir;
 					} else if (result == 2) {
-						PrintFormattedMsg("AI Config","WARNING","Backup save corrupted. Attempting file repair");
+						Log.Warning("AI Config","Backup save corrupted. Attempting file repair");
 						saveFileRepair();
-						PrintFormattedMsg("AI Config","Log","Loading AI network from primary save");
+						Log.Print("AI Config","Loading AI network from primary save");
 						loadDirectory = netSaveDir;
 					} else {
-						PrintFormattedMsg("AI Config","ERROR","Invalid save status detected in save directory. Defaulting to primary save");
+						Log.Error("AI Config","Invalid save status detected in save directory. Defaulting to primary save");
 						quit();
 					}
 				} catch {
 					//null
-					PrintFormattedMsg("AI Config","WARNING","Error reading from save status file. Defaulting to primary save");
+					Log.Warning("AI Config","Error reading from save status file. Defaulting to primary save");
 					loadDirectory = netSaveDir;
 					File.WriteAllText(netStatusFile,"0");
-					PrintFormattedMsg("AI Config","SUCCESS","Overwrote corrupt data in save file");
+					Log.Success("AI Config","Overwrote corrupt data in save file");
 				}
 			} else {
-				PrintFormattedMsg("CryptoAI","WARNING","Could not find save status file. Using default option");
+				Log.Error("CryptoAI","Could not find save status file. Using default option");
 				if (Directory.Exists(netSaveDir)) {
-					PrintFormattedMsg("AI Config","LOG","Loading AI network from primary save");
+					Log.Print("AI Config","Loading AI network from primary save");
 					loadDirectory = netSaveDir;
 				} else if (Directory.Exists(netBackupDir)) {
-					PrintFormattedMsg("AI Config","LOG","Loading AI network from backup save");
+					Log.Print("AI Config","Loading AI network from backup save");
 					loadDirectory = netBackupDir;
 				} else {
-					PrintFormattedMsg("CryptoAI","ERROR","Could not load network. No save folder detected in directory");
+					Log.Error("CryptoAI","Could not load network. No save folder detected in directory");
 					quit();
 				}
 			}
@@ -439,7 +439,7 @@ namespace CryptoAI {
 				}
 			}
 			
-			PrintFormattedMsg("CryptoAI","SUCCESS","Loaded AI network");
+			Log.Success("CryptoAI","Loaded AI network");
 			return N;
 		}
 		
@@ -458,7 +458,7 @@ namespace CryptoAI {
 		public static void saveFileRepair() {
 			if (saveDirectory == "") {
 				Console.ForegroundColor = ConsoleColor.Red;
-				PrintFormattedMsg("File Repair","ERROR","Could not repair save files. saveFileRepair was called without setting save directory");
+				Log.Error("File Repair","Could not repair save files. saveFileRepair was called without setting save directory");
 				quit();
 			}
 			
@@ -477,41 +477,41 @@ namespace CryptoAI {
 					if (result == 0) {
 					} else if (result == 1) {
 						//Primary save is corrupted
-						PrintFormattedMsg("File Repair","ERROR","Detected primary save file corruption");
-						PrintFormattedMsg("File Repair","LOG","Attempting to fix save files");
+						Log.Error("File Repair","Detected primary save file corruption");
+						Log.Print("File Repair","Attempting to fix save files");
 						
 						if (Directory.Exists(netSaveDir))
 							Directory.Delete(netSaveDir,true);
 						Directory.CreateDirectory(netSaveDir);
-						PrintFormattedMsg("File Repair","LOG","Copying from backup");
+						Log.Print("File Repair","Copying from backup");
 						CopyFilesRecursively(netBackupDir,netSaveDir);
-						PrintFormattedMsg("File Repair","LOG","Resetting file save status");
+						Log.Print("File Repair","Resetting file save status");
 						File.WriteAllText(netStatusFile,"0");
-						PrintFormattedMsg("File Repair","SUCCESS","Save files repaired!");
+						Log.Success("File Repair","Save files repaired!");
 					} else if (result == 2) {
 						//Backup save is corrupted
-						PrintFormattedMsg("File Repair","ERROR","Detected backup save file corruption");
-						PrintFormattedMsg("File Repair","LOG","Attempting to fix save files");
+						Log.Error("File Repair","Detected backup save file corruption");
+						Log.Print("File Repair","Attempting to fix save files");
 						
 						if (Directory.Exists(netBackupDir))
 							Directory.Delete(netBackupDir,true);
 						Directory.CreateDirectory(netBackupDir);
-						PrintFormattedMsg("File Repair","LOG","Copying from primary");
+						Log.Print("File Repair","Copying from primary");
 						CopyFilesRecursively(netSaveDir,netBackupDir);
-						PrintFormattedMsg("File Repair","LOG","Resetting file save status");
+						Log.Print("File Repair","Resetting file save status");
 						File.WriteAllText(netStatusFile,"0");
-						PrintFormattedMsg("File Repair","SUCCESS","Save files repaired!");
+						Log.Success("File Repair","Save files repaired!");
 					} else {
-						PrintFormattedMsg("AI Config","ERROR","Invalid save status detected in save directory. Defaulting to primary save");
+						Log.Error("AI Config","Invalid save status detected in save directory. Defaulting to primary save");
 						quit();
 					}
 				} catch {
 					//Could not read from status file
-					PrintFormattedMsg("File Repair","ERROR","An internal error has occured while repairing save data");
+					Log.Error("File Repair","An internal error has occured while repairing save data");
 					quit();
 				}
 			} else {
-				PrintFormattedMsg("AI Config","ERROR","Could not find save status file");
+				Log.Error("AI Config","Could not find save status file");
 				quit();
 			}
 		}
@@ -519,29 +519,29 @@ namespace CryptoAI {
 		public static bool clearSave() { return clearSave(true); }
 		public static bool clearSave(bool askUser) {
 			if (saveDirectory == "") {
-				PrintFormattedMsg("CryptoAI","ERROR","Could not remove save file as save directory has not been set!");
+				Log.Error("CryptoAI","Could not remove save file as save directory has not been set!");
 				quit();
 			}
 			
 			if (!Directory.Exists(saveDirectory)) {
-				PrintFormattedMsg("CryptoAI","ERROR","Could not remove save file as no save was found at directory: " + saveDirectory);
+				Log.Error("CryptoAI","Could not remove save file as no save was found at directory: " + saveDirectory);
 				return true;
 			}
 			
 			//Delete the save directory from the disk. Completely wipe it
 			if (askUser) {
-				PrintFormattedMsg("CryptoAI","WARNING","Are you absolutely certain you want to clear the saved AI network? (Y/N)");
+				Log.Error("CryptoAI","Are you absolutely certain you want to clear the saved AI network? (Y/N)");
 				char userInput = Console.ReadKey(true).KeyChar;
 				while (userInput != 'y' && userInput != 'n') { userInput = Console.ReadKey(true).KeyChar; }
 				if (userInput == 'n') {
-					PrintFormattedMsg("CryptoAI","LOG","User cancelled save data deletion");
+					Log.Print("CryptoAI","User cancelled save data deletion");
 					return false;
 				}
 			}
 			
-			PrintFormattedMsg("CryptoAI","PROCESS","Deleting AI Network save data from disk permanently");
+			Log.Print("CryptoAI","Deleting AI Network save data from disk permanently");
 			Directory.Delete(saveDirectory,true);
-			PrintFormattedMsg("CryptoAI","SUCCESS","Deleted AI save data");
+			Log.Success("CryptoAI","Deleted AI save data");
 			Directory.CreateDirectory(saveDirectory);
 			return true;
 		}
@@ -549,7 +549,7 @@ namespace CryptoAI {
 		public static void SaveNetwork(Network N) {
 			//We cannot save the AI if we don't have a directory to save it to
 			if (saveDirectory == "") {
-				PrintFormattedMsg("CryptoAI","ERROR","Could not save network. SaveNetwork was called without setting save directory");
+				Log.Error("CryptoAI","Could not save network. SaveNetwork was called without setting save directory");
 				quit();
 			}
 			
@@ -560,7 +560,7 @@ namespace CryptoAI {
 			//double sizeOfSingleGenome = JsonConvert.SerializeObject(N.genomes[0]).Length;
 			//double genomeCount = N.inputNodesCount + N.outputNodesCount + N.hiddenLayerCount*N.hiddenLayerWidth;
 			//double sizeOnDisk = genomeCount*2*sizeOfSingleGenome/1000000000;
-			//PrintFormattedMsg("CryptoAI","DEBUG","Saving AI network. This process using the JSON serializer would be estimated to take up: " + sizeOnDisk.ToString() + " GB of disk space");
+			//Log.Debug("CryptoAI","Saving AI network. This process using the JSON serializer would be estimated to take up: " + sizeOnDisk.ToString() + " GB of disk space");
 			if (!Directory.Exists(saveDirectory))
 				Directory.CreateDirectory(saveDirectory);
 			
@@ -569,39 +569,39 @@ namespace CryptoAI {
 			//Save the original copy
 			File.WriteAllText(netStatusFile,"1");
 			if (Directory.Exists(netSaveDir)) {
-				PrintFormattedMsg("CryptoAI","","Clearing old primary save");
+				Log.Print("CryptoAI","Clearing old primary save");
 				Directory.Delete(netSaveDir,true);
-				PrintFormattedMsg("CryptoAI","SUCCESS","Cleared old primary save");
+				Log.Success("CryptoAI","Cleared old primary save");
 			}
 			
-			PrintFormattedMsg("CryptoAI","","Saving AI network - primary copy");
+			Log.Print("CryptoAI","Saving AI network - primary copy");
 			Directory.CreateDirectory(netSaveDir);
 			SaveNetworkInternal_CPU_MT(N,netSaveDir);
-			PrintFormattedMsg("CryptoAI","SUCCESS","Saved AI network - primary copy");
+			Log.Success("CryptoAI","Saved AI network - primary copy");
 			
 			//Save the backup copy
 			
 			File.WriteAllText(netStatusFile,"2");
 			if (Directory.Exists(netBackupDir)) {
-				PrintFormattedMsg("CryptoAI","","Clearing old backup save");
+				Log.Print("CryptoAI","Clearing old backup save");
 				Directory.Delete(netBackupDir,true);
-				PrintFormattedMsg("CryptoAI","SUCCESS","Cleared old backup save");
+				Log.Success("CryptoAI","Cleared old backup save");
 			}
-			PrintFormattedMsg("CryptoAI","","Saving AI network - backup copy");
+			Log.Print("CryptoAI","Saving AI network - backup copy");
 			Directory.CreateDirectory(netBackupDir);
 			SaveNetworkInternal_CPU_MT(N,netBackupDir);
-			PrintFormattedMsg("CryptoAI","SUCCESS","Saved AI network - backup copy");
+			Log.Success("CryptoAI","Saved AI network - backup copy");
 			
 			//Now finish up
 			File.WriteAllText(netStatusFile,"0");
-			PrintFormattedMsg("CryptoAI","SUCCESS","Saved AI network!");
+			Log.Success("CryptoAI","Saved AI network!");
 		}
 		
 		public static void SaveNetworkInternal_CPU_MT(Network N, string dir) {
 			//Here, all of the other stuff regarding backup copies and user interfaces is done and dealt with
 			//All that's left is the raw save object code. Go nuts!
 			if (N == null) {
-				PrintFormattedMsg("CryptoAI","ERROR","Could not save network. Null AI network cannot be saved");
+				Log.Error("CryptoAI","Could not save network. Null AI network cannot be saved");
 				quit();
 			}
 			
@@ -678,7 +678,7 @@ namespace CryptoAI {
 		public static void PrintFormattedMsg(string moduleName, string msgType, string msg) => Log.PrintFormattedMsg(moduleName, msgType, msg);
 		
 		public static Network NewNetwork_CPU_MT(int genomeCount, int inputNodes, int nodesPerHiddenLayer, int hiddenLayerCount, int outputNodes) {
-			PrintFormattedMsg("AI Config","WARNING","Generating new AI Network. This may take awhile...");
+			Log.Warning("AI Config","Generating new AI Network. This may take awhile...");
 			
 			Network N = new Network();
 			N.inputNodesCount = inputNodes;
@@ -741,7 +741,7 @@ namespace CryptoAI {
 				}
 			}
 			
-			PrintFormattedMsg("AI Config","SUCCESS","Created new AI network");
+			Log.Success("AI Config","Created new AI network");
 			int[] genomeTypeCounts = new int[genomeActivationTypes.Length];
 			for (int x = 0; x < N.genomes.Length; x++) {
 				for(int i = 0; i < genomeTypeCounts.Length; i++) {
@@ -753,7 +753,7 @@ namespace CryptoAI {
 			}
 			
 			for(int i = 0; i < genomeTypeCounts.Length; i++) {
-				PrintFormattedMsg("AI Config","LOG","Genome Type: " + genomeActivationTypes[i] + "\t\tQuantity: " + genomeTypeCounts[i]);
+				Log.Print("AI Config","Genome Type: " + genomeActivationTypes[i] + "\t\tQuantity: " + genomeTypeCounts[i]);
 			}
 			
 			return N;
@@ -763,17 +763,17 @@ namespace CryptoAI {
 			int nullDetected = 0;
 			for(int i = 0; i < N.genomes.Length; i++) {
 				if (N.genomes[i] == null) {
-					PrintFormattedMsg("AI Config","ERROR","Genome " + (i+1).ToString() + "/" + N.genomes.Length.ToString() + ":\t\tStatus - Null");
+					Log.Error("AI Config","Genome " + (i+1).ToString() + "/" + N.genomes.Length.ToString() + ":\t\tStatus - Null");
 					nullDetected++;
 				} else {
-					PrintFormattedMsg("AI Config","SUCCESS","Genome " + (i+1).ToString() + "/" + N.genomes.Length.ToString() + ":\t\tStatus - Functional\t\tID: " + N.genomes[i].ID);
+					Log.Success("AI Config","Genome " + (i+1).ToString() + "/" + N.genomes.Length.ToString() + ":\t\tStatus - Functional\t\tID: " + N.genomes[i].ID);
 				}
 			}
 			return nullDetected;
 		}
 		
 		public static void CalculateNextNetworkIteration_CPU_MT(ref Network N) {
-			PrintFormattedMsg("CryptoAI","LOG","Iterating network");
+			Log.Print("CryptoAI","Iterating network");
 			
 			List<ThreadDataContainer3> TDC_List = new List<ThreadDataContainer3>();
 			bool run = true;
@@ -822,7 +822,7 @@ namespace CryptoAI {
 		}
 		
 		public static void RegenerateAllGenomes_CPU(ref Network N) {
-			PrintFormattedMsg("CryptoAI","DEBUG","Regenerating genomes...");
+			Log.Debug("CryptoAI","Regenerating genomes...");
 			for (int gI = 0; gI < N.genomes.Length; gI++) {
 				Genome g = N.genomes[gI];
 				for (int nI = 0; nI < g.nodes.Length; nI++) {
@@ -1094,7 +1094,7 @@ namespace CryptoAI {
 				JObject rawGenomeData = (JObject)JsonConvert.DeserializeObject(File.ReadAllText(TDC.dir));
 				g.nodes = new Node[rawGenomeData.Count];
 				
-				NetworkInterface.PrintFormattedMsg("CryptoAI","ERROR","Could not complete loading network in dumpAndPump mode. W.I.P");
+				Log.Error("CryptoAI","Could not complete loading network in dumpAndPump mode. W.I.P");
 				NetworkInterface.quit();
 			}
 			

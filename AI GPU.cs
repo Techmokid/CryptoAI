@@ -86,7 +86,7 @@ namespace CryptoAI {
 			workerThreadGPU.Start();
 			SaveNetworkGPU();
 			CPUIsReadyForCopying = true;
-			NI.PrintFormattedMsg("GPU","DEBUG","Waiting for GPU to finish...");
+			Log.Debug("GPU","Waiting for GPU to finish...");
 			while(!GPUIsReady) {} //Do nothing
 		}
 		
@@ -95,7 +95,7 @@ namespace CryptoAI {
 			// Start the GPU handling thread.
 			// Simply just keep telling the GPU to do another "x" iterations of the network until the CPU has finished saving it's copy of the AI to disk
 			if (saveDirectory == "") {
-				NI.PrintFormattedMsg("CryptoAI","ERROR","Could not save GPU network. SaveNetworkGPU was called without setting save directory");
+				Log.Error("CryptoAI","Could not save GPU network. SaveNetworkGPU was called without setting save directory");
 				NI.quit();
 			}
 			
@@ -109,29 +109,29 @@ namespace CryptoAI {
 			//Save the original copy
 			File.WriteAllText(netStatusFile,"1");
 			if (Directory.Exists(netSaveDir)) {
-				NI.PrintFormattedMsg("CryptoAI","","Clearing old primary save");
+				Log.Debug("CryptoAI","Clearing old primary save");
 				Directory.Delete(netSaveDir,true);
-				NI.PrintFormattedMsg("CryptoAI","SUCCESS","Cleared old primary save");
+				Log.Success("CryptoAI","Cleared old primary save");
 			}
-			NI.PrintFormattedMsg("CryptoAI","","Saving AI network - primary copy");
+			Log.Debug("CryptoAI","Saving AI network - primary copy");
 			Directory.CreateDirectory(netSaveDir);
 			SaveGPUNetworkInternal(netSaveDir);
-			NI.PrintFormattedMsg("CryptoAI","SUCCESS","Saved AI network - primary copy");
+			Log.Success("CryptoAI","Saved AI network - primary copy");
 			
 			//Save the backup copy
 			File.WriteAllText(netStatusFile,"2");
 			if (Directory.Exists(netBackupDir)) {
-				NI.PrintFormattedMsg("CryptoAI","","Clearing old backup save");
+				Log.Debug("CryptoAI","Clearing old backup save");
 				Directory.Delete(netBackupDir,true);
-				NI.PrintFormattedMsg("CryptoAI","SUCCESS","Cleared old backup save");
+				Log.Success("CryptoAI","Cleared old backup save");
 			}
-			NI.PrintFormattedMsg("CryptoAI","","Saving AI network - backup copy");
+			Log.Debug("CryptoAI","Saving AI network - backup copy");
 			NI.CopyFilesRecursively(netSaveDir,netBackupDir);
-			NI.PrintFormattedMsg("CryptoAI","SUCCESS","Saved AI network - backup copy");
+			Log.Success("CryptoAI","Saved AI network - backup copy");
 			
 			//Now finish up
 			File.WriteAllText(netStatusFile,"0");
-			NI.PrintFormattedMsg("CryptoAI","SUCCESS","Saved AI network!");
+			Log.Success("CryptoAI","Saved AI network!");
 		}
 		
 		public void SaveGPUNetworkInternal(string dir) {
@@ -147,9 +147,9 @@ namespace CryptoAI {
 			int maxThreadCount = 16;
 			int currentThreadCount = 0;
 			
-			NI.PrintFormattedMsg("AI Save","LOG","Genome File Count: " + Math.Ceiling((float)NGPU.genomes.Length/(float)numberOfIndexesPerThread));
-			NI.PrintFormattedMsg("AI Save","LOG","Node File Count: " + Math.Ceiling((float)NGPU.nodes.Length/(float)numberOfIndexesPerThread));
-			NI.PrintFormattedMsg("AI Save","LOG","Node Connections File Count: " + Math.Ceiling((float)NGPU.connections.Length/(float)numberOfIndexesPerThread));
+			Log.Print("AI Sace","Genome File Count: " + Math.Ceiling((float)NGPU.genomes.Length/(float)numberOfIndexesPerThread));
+			Log.Print("AI Sace","Node File Count: " + Math.Ceiling((float)NGPU.nodes.Length/(float)numberOfIndexesPerThread));
+			Log.Print("AI Sace","Node Connections File Count: " + Math.Ceiling((float)NGPU.connections.Length/(float)numberOfIndexesPerThread));
 			
 			//Now we actually start saving the AI to disk
 			int numIterations = 0;
@@ -173,7 +173,7 @@ namespace CryptoAI {
 					//Console.WriteLine("Connections Count: " + NGPU.connections.Length.ToString());
 					
 					if (TDC.EndIndex >= NGPU.connections.Length) {
-						NI.PrintFormattedMsg("AI Save","ERROR","Connection indexing error!!");
+						Log.Error("AI Save","Connection indexing error!!");
 						NI.quit();
 					}
 					
@@ -196,7 +196,7 @@ namespace CryptoAI {
 						//Console.WriteLine("Nodes End:   " + TDC2.EndIndex.ToString());
 						//Console.WriteLine("Nodes Count: " + NGPU.nodes.Length.ToString());
 						if (TDC2.EndIndex >= NGPU.nodes.Length) {
-							NI.PrintFormattedMsg("AI Save","ERROR","Node indexing error!!");
+							Log.Error("AI Save","Node indexing error!!");
 							NI.quit();
 						}
 						TDC_List.Add(TDC2);
@@ -217,7 +217,7 @@ namespace CryptoAI {
 						//Console.WriteLine("Genome End:   " + TDC3.EndIndex.ToString());
 						//Console.WriteLine("Genome Count: " + NGPU.genomes.Length.ToString());
 						if (TDC3.EndIndex >= NGPU.genomes.Length) {
-							NI.PrintFormattedMsg("AI Save","ERROR","Genome indexing error!!");
+							Log.Error("AI Save","Genome indexing error!!");
 							NI.quit();
 						}
 						TDC_List.Add(TDC3);
@@ -251,7 +251,7 @@ namespace CryptoAI {
 			}
 			
 			S.Stop();
-			NI.PrintFormattedMsg("AI","LOG","Actual save time taken: " + TimeFormatter((double)S.Elapsed.Milliseconds / 1000 / 60 / 60));
+			Log.Print("AI Save","Actual save time taken: " + TimeFormatter((double)S.Elapsed.Milliseconds / 1000 / 60 / 60));
 		}
 		
 		public void CheckGPUStatus(List<double[]> data) {
@@ -279,12 +279,12 @@ namespace CryptoAI {
 								worstFitness = NGPU.genomes[x].fitness;
 						}
 						meanFitness /= NGPU.genomes.Length;
-						NI.PrintFormattedMsg("CPU","DEBUG",(i + 1) + "/" + trainingData.Count + "\t\tBest Fitness: " + bestFitness + "\t\tWorst Fitness: " + worstFitness + "\t\tMean Fitness: " + meanFitness);
+						Log.Debug("CPU",(i + 1) + "/" + trainingData.Count + "\t\tBest Fitness: " + bestFitness + "\t\tWorst Fitness: " + worstFitness + "\t\tMean Fitness: " + meanFitness);
 					}
 					if (!CPUIsReadyForCopying) {
-						NI.PrintFormattedMsg("CPU","DEBUG","CPU has not finished saving to disk. Iterating GPU again");
+						Log.Debug("CPU","CPU has not finished saving to disk. Iterating GPU again");
 					} else {
-						NI.PrintFormattedMsg("CPU","DEBUG","CPU has finished saving to disk. Copying GPU AI to RAM");
+						Log.Debug("CPU","CPU has finished saving to disk. Copying GPU AI to RAM");
 					}
 				}
 			}
@@ -295,11 +295,11 @@ namespace CryptoAI {
 		public void LoadNetworkGPU() {
 			if (saveDirectory == "") {
 				Console.ForegroundColor = ConsoleColor.Red;
-				NI.PrintFormattedMsg("CryptoAI","ERROR","Could not load network. LoadNetwork was called without setting save directory");
+				Log.Error("CryptoAI","Could not load network. LoadNetwork was called without setting save directory");
 				NI.quit();
 			}
 			
-			NI.PrintFormattedMsg("AI Config","WARNING","Loading AI network can take several minutes...");
+			Log.Warning("AI Config","Loading AI network can take several minutes...");
 			
 			string netSaveDir = saveDirectory + "Network Save Orig/";
 			string netBackupDir = saveDirectory + "Network Save Backup/";
@@ -314,39 +314,39 @@ namespace CryptoAI {
 				try {
 					int result = int.Parse(File.ReadAllText(netStatusFile));
 					if (result == 0) {
-						NI.PrintFormattedMsg("AI Config","LOG","Loading AI network from primary save");
+						Log.Print("AI Config","Loading AI network from primary save");
 						loadDirectory = netSaveDir;
 					} else if (result == 1) {
-						NI.PrintFormattedMsg("AI Config","WARNING","Primary save corrupted. Attempting file repair");
+						Log.Warning("AI Config","Primary save corrupted. Attempting file repair");
 						NI.saveFileRepair();
-						NI.PrintFormattedMsg("AI Config","Log","Loading AI network from backup save");
+						Log.Print("AI Config","Loading AI network from backup save");
 						loadDirectory = netBackupDir;
 					} else if (result == 2) {
-						NI.PrintFormattedMsg("AI Config","WARNING","Backup save corrupted. Attempting file repair");
+						Log.Warning("AI Config","Backup save corrupted. Attempting file repair");
 						NI.saveFileRepair();
-						NI.PrintFormattedMsg("AI Config","Log","Loading AI network from primary save");
+						Log.Print("AI Config","Loading AI network from primary save");
 						loadDirectory = netSaveDir;
 					} else {
-						NI.PrintFormattedMsg("AI Config","ERROR","Invalid save status detected in save directory. Defaulting to primary save");
+						Log.Error("AI Config","Invalid save status detected in save directory. Defaulting to primary save");
 						NI.quit();
 					}
 				} catch {
 					//null
-					NI.PrintFormattedMsg("AI Config","WARNING","Error reading from save status file. Defaulting to primary save");
+					Log.Warning("AI Config","Error reading from save status file. Defaulting to primary save");
 					loadDirectory = netSaveDir;
 					File.WriteAllText(netStatusFile,"0");
-					NI.PrintFormattedMsg("AI Config","SUCCESS","Overwrote corrupt data in save file");
+					Log.Success("AI Config","Overwrote corrupt data in save file");
 				}
 			} else {
-				NI.PrintFormattedMsg("CryptoAI","WARNING","Could not find save status file. Using default option");
+				Log.Warning("CryptoAI","Could not find save status file. Using default option");
 				if (Directory.Exists(netSaveDir)) {
-					NI.PrintFormattedMsg("AI Config","LOG","Loading AI network from primary save");
+					Log.Print("AI Config","Loading AI network from primary save");
 					loadDirectory = netSaveDir;
 				} else if (Directory.Exists(netBackupDir)) {
-					NI.PrintFormattedMsg("AI Config","LOG","Loading AI network from backup save");
+					Log.Print("AI Config","Loading AI network from backup save");
 					loadDirectory = netBackupDir;
 				} else {
-					NI.PrintFormattedMsg("CryptoAI","ERROR","Could not load network. No save folder detected in directory");
+					Log.Error("CryptoAI","Could not load network. No save folder detected in directory");
 					NI.quit();
 				}
 			}
@@ -495,8 +495,8 @@ namespace CryptoAI {
 			
 			if (doOnce) {
 				s.Stop();
-				NI.PrintFormattedMsg("AI Thread", "DEBUG", "Time per node connection: " + s.Elapsed.Milliseconds.ToString() + " ms");
-				NI.PrintFormattedMsg("AI Thread", "DEBUG", "Time to save entire network: " + TimeFormatter((double)s.Elapsed.Milliseconds * NGPU.connections.Length / (double)numberOfIndexesPerThread / 1000 / 60 / 60));
+				Log.Debug("AI Thread", "Time per node connection: " + s.Elapsed.Milliseconds.ToString() + " ms");
+				Log.Debug("AI Thread", "Time to save entire network: " + TimeFormatter((double)s.Elapsed.Milliseconds * NGPU.connections.Length / (double)numberOfIndexesPerThread / 1000 / 60 / 60));
 			}
 			
 			
@@ -715,16 +715,16 @@ namespace CryptoAI {
 			int nodeCountPerGenome = inputNodes + nodesPerLayer*hiddenLayerCount + outputNodes;
 			int connCountPerGenome = inputNodes*nodesPerLayer + hiddenLayerCount*(hiddenLayerCount-1) + outputNodes*nodesPerLayer;
 			
-			NI.PrintFormattedMsg("AI GPU","DEBUG","New GPU Network Data:");
-			NI.PrintFormattedMsg("AI GPU","DEBUG"," - Genome Count: " + genomeCount.ToString());
-			NI.PrintFormattedMsg("AI GPU","DEBUG"," - Nodes Per Genome: " + nodeCountPerGenome.ToString());
-			NI.PrintFormattedMsg("AI GPU","DEBUG"," - Node Connections Per Genome: " + connCountPerGenome.ToString());
-			NI.PrintFormattedMsg("AI GPU","DEBUG"," - Nodes Total: " + (nodeCountPerGenome*genomeCount).ToString());
-			NI.PrintFormattedMsg("AI GPU","DEBUG"," - Connections Total: " + (connCountPerGenome*genomeCount).ToString());
-			//NI.PrintFormattedMsg("AI GPU","DEBUG","");
-			//NI.PrintFormattedMsg("AI GPU","DEBUG"," - Genome Folder Size: " + ((double)genomeCount * (double)Marshal.SizeOf(new Genome_GPU())/1000000).ToString() + " MB");
-			//NI.PrintFormattedMsg("AI GPU","DEBUG"," - Node Folder Size: " + ((double)nodeCountPerGenome*(double)genomeCount * (double)Marshal.SizeOf(new Node_GPU())/1000000).ToString() + " MB");
-			//NI.PrintFormattedMsg("AI GPU","DEBUG"," - Node Connections Folder Size: " + ((double)connCountPerGenome*(double)genomeCount * (double)Marshal.SizeOf(new NodeConnection_GPU())/1000000).ToString() + " MB");
+			Log.Debug("AI GPU","New GPU Network Data:");
+			Log.Debug("AI GPU"," - Genome Count: " + genomeCount.ToString());
+			Log.Debug("AI GPU"," - Nodes Per Genome: " + nodeCountPerGenome.ToString());
+			Log.Debug("AI GPU"," - Node Connections Per Genome: " + connCountPerGenome.ToString());
+			Log.Debug("AI GPU"," - Nodes Total: " + (nodeCountPerGenome*genomeCount).ToString());
+			Log.Debug("AI GPU"," - Connections Total: " + (connCountPerGenome*genomeCount).ToString());
+			//Log.Debug("AI GPU","");
+			//Log.Debug("AI GPU"," - Genome Folder Size: " + ((double)genomeCount * (double)Marshal.SizeOf(new Genome_GPU())/1000000).ToString() + " MB");
+			//Log.Debug("AI GPU"," - Node Folder Size: " + ((double)nodeCountPerGenome*(double)genomeCount * (double)Marshal.SizeOf(new Node_GPU())/1000000).ToString() + " MB");
+			//Log.Debug("AI GPU"," - Node Connections Folder Size: " + ((double)connCountPerGenome*(double)genomeCount * (double)Marshal.SizeOf(new NodeConnection_GPU())/1000000).ToString() + " MB");
 			
 			NGPU = new Network_GPU();
 			int totalNodeCountPerGenome = (inputNodes +
