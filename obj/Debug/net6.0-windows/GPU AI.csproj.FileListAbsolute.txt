@@ -1,0 +1,50 @@
+C:\Users\aj200\Documents\GitHub\My-Projects\Active Projects\GPU AI\obj\Debug\net6.0-windows\GPU AI.csproj.AssemblyReference.cache
+C:\Users\aj200\Documents\GitHub\My-Projects\Active Projects\GPU AI\obj\Debug\net6.0-windows\GPU AI.csproj.SuggestedBindingRedirects.cache
+C:\Users\aj200\Documents\GitHub\My-Projects\Active Projects\GPU AI\obj\Debug\net6.0-windows\GPU AI.dll.config
+C:\Users\aj200\Documents\GitHub\My-Projects\Active Projects\GPU AI\obj\Debug\net6.0-windows\GPU AI.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\aj200\Documents\GitHub\My-Projects\Active Projects\GPU AI\obj\Debug\net6.0-windows\GPU AI.AssemblyInfoInputs.cache
+C:\Users\aj200\Documents\GitHub\My-Projects\Active Projects\GPU AI\obj\Debug\net6.0-windows\GPU AI.AssemblyInfo.cs
+C:\Users\aj200\Documents\GitHub\My-Projects\Active Projects\GPU AI\obj\Debug\net6.0-windows\GPU AI.csproj.CoreCompileInputs.cache
+C:\Users\aj200\Documents\GitHub\My-Projects\Active Projects\GPU AI\bin\Debug\net6.0-windows\GPU AI.exe
+C:\Users\aj200\Documents\GitHub\My-Projects\Active Projects\GPU AI\bin\Debug\net6.0-windows\GPU AI.dll.config
+C:\Users\aj200\Documents\GitHub\My-Projects\Active Projects\GPU AI\bin\Debug\net6.0-windows\GPU AI.deps.json
+C:\Users\aj200\Documents\GitHub\My-Projects\Active Projects\GPU AI\bin\Debug\net6.0-windows\GPU AI.runtimeconfig.json
+C:\Users\aj200\Documents\GitHub\My-Projects\Active Projects\GPU AI\bin\Debug\net6.0-windows\GPU AI.dll
+C:\Users\aj200\Documents\GitHub\My-Projects\Active Projects\GPU AI\bin\Debug\net6.0-windows\ref\GPU AI.dll
+C:\Users\aj200\Documents\GitHub\My-Projects\Active Projects\GPU AI\bin\Debug\net6.0-windows\GPU AI.pdb
+C:\Users\aj200\Documents\GitHub\My-Projects\Active Projects\GPU AI\bin\Debug\net6.0-windows\CommunityToolkit.Diagnostics.dll
+C:\Users\aj200\Documents\GitHub\My-Projects\Active Projects\GPU AI\bin\Debug\net6.0-windows\ComputeSharp.dll
+C:\Users\aj200\Documents\GitHub\My-Projects\Active Projects\GPU AI\bin\Debug\net6.0-windows\ComputeSharp.Dynamic.dll
+C:\Users\aj200\Documents\GitHub\My-Projects\Active Projects\GPU AI\bin\Debug\net6.0-windows\Microsoft.Threading.Tasks.Extensions.Desktop.dll
+C:\Users\aj200\Documents\GitHub\My-Projects\Active Projects\GPU AI\bin\Debug\net6.0-windows\Microsoft.Threading.Tasks.Extensions.dll
+C:\Users\aj200\Documents\GitHub\My-Projects\Active Projects\GPU AI\bin\Debug\net6.0-windows\Microsoft.Threading.Tasks.dll
+C:\Users\aj200\Documents\GitHub\My-Projects\Active Projects\GPU AI\bin\Debug\net6.0-windows\System.Net.Http.Extensions.dll
+C:\Users\aj200\Documents\GitHub\My-Projects\Active Projects\GPU AI\bin\Debug\net6.0-windows\System.Net.Http.Primitives.dll
+C:\Users\aj200\Documents\GitHub\My-Projects\Active Projects\GPU AI\bin\Debug\net6.0-windows\Microsoft.Win32.SystemEvents.dll
+C:\Users\aj200\Documents\GitHub\My-Projects\Active Projects\GPU AI\bin\Debug\net6.0-windows\Newtonsoft.Json.dll
+C:\Users\aj200\Documents\GitHub\My-Projects\Active Projects\GPU AI\bin\Debug\net6.0-windows\System.Drawing.Common.dll
+C:\Users\aj200\Documents\GitHub\My-Projects\Active Projects\GPU AI\bin\Debug\net6.0-windows\TerraFX.Interop.D3D12MemoryAllocator.dll
+C:\Users\aj200\Documents\GitHub\My-Projects\Active Projects\GPU AI\bin\Debug\net6.0-windows\TerraFX.Interop.Windows.dll
+C:\Users\aj200\Documents\GitHub\My-Projects\Active Projects\GPU AI\bin\Debug\net6.0-windows\unirest-net.dll
+C:\Users\aj200\Documents\GitHub\My-Projects\Active Projects\GPU AI\bin\Debug\net6.0-windows\runtimes\win-arm64\native\dxcompiler.dll
+C:\Users\aj200\Documents\GitHub\My-Projects\Active Projects\GPU AI\bin\Debug\net6.0-windows\runtimes\win-arm64\native\dxil.dll
+C:\Users\aj200\Documents\GitHub\My-Projects\Active Projects\GPU AI\bin\Debug\net6.0-windows\runtimes\win-x64\native\dxcompiler.dll
+C:\Users\aj200\Documents\GitHub\My-Projects\Active Projects\GPU AI\bin\Debug\net6.0-windows\runtimes\win-x64\native\dxil.dll
+C:\Users\aj200\Documents\GitHub\My-Projects\Active Projects\GPU AI\bin\Debug\net6.0-windows\runtimes\win\lib\netcoreapp2.0\Microsoft.Win32.SystemEvents.dll
+C:\Users\aj200\Documents\GitHub\My-Projects\Active Projects\GPU AI\bin\Debug\net6.0-windows\runtimes\unix\lib\netcoreapp2.0\System.Drawing.Common.dll
+C:\Users\aj200\Documents\GitHub\My-Projects\Active Projects\GPU AI\bin\Debug\net6.0-windows\runtimes\win\lib\netcoreapp2.0\System.Drawing.Common.dll
+C:\Users\aj200\Documents\GitHub\My-Projects\Active Projects\GPU AI\obj\Debug\net6.0-windows\GPU AI.csproj.CopyComplete
+C:\Users\aj200\Documents\GitHub\My-Projects\Active Projects\GPU AI\obj\Debug\net6.0-windows\GPU AI.dll
+C:\Users\aj200\Documents\GitHub\My-Projects\Active Projects\GPU AI\obj\Debug\net6.0-windows\ref\GPU AI.dll
+C:\Users\aj200\Documents\GitHub\My-Projects\Active Projects\GPU AI\obj\Debug\net6.0-windows\GPU AI.pdb
+C:\Users\aj200\Documents\GitHub\My-Projects\Active Projects\GPU AI\obj\Debug\net6.0-windows\GPU AI.genruntimeconfig.cache
+C:\Users\aj200\Documents\GitHub\My-Projects\Active Projects\GPU AI\bin\Debug\net6.0-windows\IronXL.dll
+C:\Users\aj200\Documents\GitHub\My-Projects\Active Projects\GPU AI\bin\Debug\net6.0-windows\Google.Protobuf.dll
+C:\Users\aj200\Documents\GitHub\My-Projects\Active Projects\GPU AI\bin\Debug\net6.0-windows\MethodBoundaryAspect.dll
+C:\Users\aj200\Documents\GitHub\My-Projects\Active Projects\GPU AI\bin\Debug\net6.0-windows\Microsoft.Extensions.DependencyInjection.dll
+C:\Users\aj200\Documents\GitHub\My-Projects\Active Projects\GPU AI\bin\Debug\net6.0-windows\Microsoft.Extensions.DependencyInjection.Abstractions.dll
+C:\Users\aj200\Documents\GitHub\My-Projects\Active Projects\GPU AI\bin\Debug\net6.0-windows\Protobuf.Text.dll
+C:\Users\aj200\Documents\GitHub\My-Projects\Active Projects\GPU AI\bin\Debug\net6.0-windows\Serilog.dll
+C:\Users\aj200\Documents\GitHub\My-Projects\Active Projects\GPU AI\bin\Debug\net6.0-windows\Serilog.Sinks.Console.dll
+C:\Users\aj200\Documents\GitHub\My-Projects\Active Projects\GPU AI\bin\Debug\net6.0-windows\Tensorflow.Binding.dll
+C:\Users\aj200\Documents\GitHub\My-Projects\Active Projects\GPU AI\bin\Debug\net6.0-windows\NumSharp.dll
