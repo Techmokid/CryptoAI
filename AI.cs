@@ -674,75 +674,8 @@ namespace CryptoAI {
 			Console.ReadLine();
 			System.Environment.Exit(1);
 		}
-		
-		public static bool printTime = false;
-		public static bool centerText = true;
-		public static bool printModuleName = true;
-		public static void PrintFormattedMsg(string moduleName, string msgType, string msg) {
-			ConsoleColor startingColor = ConsoleColor.White;
-			if (msgType.ToLower()=="log")
-				msgType="";
-			int digits = 0;
-			
-			//Setting up the colours
-			ConsoleColor moduleBracketsColor = ConsoleColor.White;
-			ConsoleColor moduleNameColor = ConsoleColor.Cyan;
-			ConsoleColor timeBrackets = ConsoleColor.White;
-			ConsoleColor time = ConsoleColor.White;
-			ConsoleColor msgTypeBracketsColor = ConsoleColor.White;
-			ConsoleColor msgTypeColor = ConsoleColor.Gray;
-			msgTypeColor = msgType.ToLower()=="warning"	? ConsoleColor.Yellow 	: msgTypeColor;
-			msgTypeColor = msgType.ToLower()=="success"	? ConsoleColor.Green 	: msgTypeColor;
-			msgTypeColor = msgType.ToLower()=="error"	? ConsoleColor.Red 		: msgTypeColor;
-			msgTypeColor = msgType.ToLower()=="debug"	? ConsoleColor.Magenta 	: msgTypeColor;
-			msgTypeColor = msgType.ToLower()=="log"		? ConsoleColor.White 	: msgTypeColor;
-			ConsoleColor msgColor = ConsoleColor.White;
-			
-			//Actually print the message
-			if (printTime) {
-				Console.ForegroundColor = timeBrackets;
-				Console.Write("[");
-				Console.ForegroundColor = time;
-				String s = DateTime.Now.TimeOfDay.ToString();
-				for(int i = 0; i < 7 - digits; i++) { s = s.Remove(s.Length-1); }
-				if (digits == 0)
-					s = s.Remove(s.Length-1);
-				Console.Write(s);
-				Console.ForegroundColor = timeBrackets;
-				Console.Write("]");
-			}
-			
-			if (printModuleName) {
-				Console.ForegroundColor = moduleBracketsColor;
-				Console.Write("[");
-				Console.ForegroundColor = moduleNameColor;
-				Console.Write(moduleName);
-				Console.ForegroundColor = moduleBracketsColor;
-				Console.Write("]");
-			}
-			
-			Console.ForegroundColor = msgTypeBracketsColor;
-			Console.Write("[");
-			Console.ForegroundColor = msgTypeColor;
-			
-			if (centerText) {
-				for(int i = 0; i < 3 - msgType.Length/2; i++) { Console.Write(" "); }
-			}
-			Console.Write(msgType);
-			if (centerText) {
-				for(int i = 0; i < 3 - msgType.Length/2; i++) { Console.Write(" "); }
-				if (msgType.Length % 2 == 0)
-					Console.Write(" ");
-			}
-			Console.ForegroundColor = msgTypeBracketsColor;
-			Console.Write("] ");
-			if (!centerText) {
-				for(int i = 0; i < 7 - msgType.Length; i++) { Console.Write(" "); }
-			}
-			Console.ForegroundColor = msgColor;
-			Console.WriteLine(msg);
-			Console.ForegroundColor = startingColor;
-		}
+		[System.Obsolete("Use the Log class instead.")]
+		public static void PrintFormattedMsg(string moduleName, string msgType, string msg) => Log.PrintFormattedMsg(moduleName, msgType, msg);
 		
 		public static Network NewNetwork_CPU_MT(int genomeCount, int inputNodes, int nodesPerHiddenLayer, int hiddenLayerCount, int outputNodes) {
 			PrintFormattedMsg("AI Config","WARNING","Generating new AI Network. This may take awhile...");
