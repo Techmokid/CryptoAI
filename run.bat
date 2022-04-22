@@ -1,1 +1,0 @@
-cd "C:\Users\aj200\Documents\GitHub\CryptoAI\CryptoAI" && dotnet build && dotnet run || pause
