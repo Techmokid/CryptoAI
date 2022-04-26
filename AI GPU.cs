@@ -590,6 +590,7 @@ namespace CryptoAI {
 			
 			outputsCount *= NGPU.genomes.Length;
 			
+			Console.WriteLine("Pre Outputs: " + outputsCount);
 			double[] inputsArray = new double[inputsCount];
 			double[] outputsArray = new double[outputsCount];
 			
@@ -618,10 +619,10 @@ namespace CryptoAI {
 				false
 			));
 			
+			nBuff.CopyTo(NGPU.nodes);
 			for(int i = 0; i < NGPU.nodes.Length; i++) {
-				if (NGPU.nodes[i].nIO) {
-					Console.WriteLine("Input node: " + NGPU.nodes[i].ID);
-				}
+				if (NGPU.nodes[i].nIO)
+					Console.WriteLine("Output node: " + NGPU.nodes[i].ID);
 			}
 			
 			outputsBuff.CopyTo(outputsArray);
@@ -857,6 +858,9 @@ namespace CryptoAI {
 			public readonly bool isTraining;
 			
 			public void Execute() {
+				if (nodes[ThreadIds.X].nIO)
+					genomeOutputs[2] = 2;
+				
 				if (isTraining == false) {
 					CalculateNodeOutput(ThreadIds.X);
 					return;
@@ -920,7 +924,7 @@ namespace CryptoAI {
 				}
 			}
 			
-			public void CalculateNodeOutput(int ID) {
+			void CalculateNodeOutput(int ID) {
 				int genomePos = GetGenomeIndex(ID);
 				
 				//If we are an input node, take the value from the inputs array
@@ -971,7 +975,7 @@ namespace CryptoAI {
 				
 			}
 			
-			public void RollbackAndAdjustWeight(int nodeID) {
+			void RollbackAndAdjustWeight(int nodeID) {
 				int genIndex = GetGenomeIndex(nodeID);
 				if (genomes[genIndex].fitness < genomes[genIndex].prev_fitness) {
 					nodes[nodeID].tT = nodes[nodeID].pTT;
@@ -987,9 +991,9 @@ namespace CryptoAI {
 				nodes[nodeID].tS = 1; clamp(nodes[nodeID].tS + (GetRandomFloat(nodeID) * adjustmentVar * 2 - adjustmentVar),0,1);
 			}
 			
-			public int GetGenomeIndex(int nodeID) { return (int)Math.Floor((float)((double)genomes.Length * (double)nodeID / (double)nodes.Length)); }
+			int GetGenomeIndex(int nodeID) { return (int)Math.Floor((float)((double)genomes.Length * (double)nodeID / (double)nodes.Length)); }
 			
-			public double clamp(double x, double m, double M) {
+			double clamp(double x, double m, double M) {
 				if (x > M)
 					x = M;
 				if (x < m)
@@ -998,9 +1002,9 @@ namespace CryptoAI {
 			}
 			
 			// Simple code for getting a random number on the GPU
-			public double dot(double a1, double a2, double b1, double b2) { return a1*b1 + a2*b2; }
-			public double frac(double x) { return  x - Math.Floor((float)x); }
-			public double GetRandomFloat(int nodeID) {
+			double dot(double a1, double a2, double b1, double b2) { return a1*b1 + a2*b2; }
+			double frac(double x) { return  x - Math.Floor((float)x); }
+			double GetRandomFloat(int nodeID) {
 				int randomInputSeed = nodeID + randomOffset[nodeID] * maxThreadCount + randomSeed;
 				randomOffset[nodeID] = randomOffset[nodeID] + 1;
 				
