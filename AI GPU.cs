@@ -860,6 +860,7 @@ namespace CryptoAI {
 			public void Execute() {
 				if (nodes[ThreadIds.X].nIO)
 					genomeOutputs[2] = 2;
+				return;
 				
 				if (isTraining == false) {
 					CalculateNodeOutput(ThreadIds.X);
