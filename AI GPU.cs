@@ -841,9 +841,9 @@ namespace CryptoAI {
 		
 		[AutoConstructor]
 		public readonly partial struct GPU_AI_PerNode : IComputeShader {
-			public readonly ReadWriteBuffer<Genome_GPU> genomes;	                  	// This contains the genome objects that tell the GPU where each genome starts
-			public readonly ReadWriteBuffer<Node_GPU> nodes;		                  	// This contains the node objects
-			public readonly ReadWriteBuffer<NodeConnection_GPU> nodeConnections;		// This contains all of the node connections data
+			public readonly ReadWriteBuffer<Genome_GPU> genomes;	             // This contains the genome objects that tell the GPU where each genome starts
+			public readonly ReadWriteBuffer<Node_GPU> nodes;		             // This contains the node objects
+			public readonly ReadWriteBuffer<NodeConnection_GPU> nodeConnections; // This contains all of the node connections data
 			
 			public readonly ReadWriteBuffer<double> genomeInputs;
 			public readonly ReadWriteBuffer<double> genomeOutputs;
