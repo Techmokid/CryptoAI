@@ -671,6 +671,7 @@ namespace CryptoAI {
 			Console.WriteLine();
 			Console.WriteLine("--------------------------------------");
 			Console.WriteLine("Please press Enter to quit the program");
+			Console.ForegroundColor = ConsoleColor.White;
 			Console.ReadLine();
 			System.Environment.Exit(1);
 		}

@@ -127,7 +127,13 @@ namespace Binance_API {
 					} catch {}
 				}
 				
-				File.WriteAllText(filePath + "HistoricDataCache.json", fileDataResult2);
+				try {
+					File.WriteAllText(filePath + "HistoricDataCache.json", fileDataResult2);
+				} catch {
+					Log.Error("API Interface", "Failed to save historic data cache to directory: " + filePath + "HistoricDataCache.json");
+					Log.Error("API Interface", "Please check that the file path is accessable, and this program has permissions to write to it");
+					NetworkInterface.quit();
+				}
 			}
 			
 			string fileDataResult = "";

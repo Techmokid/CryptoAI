@@ -50,13 +50,11 @@ namespace CryptoAI {
 		
 		public struct Node_GPU {
 			public Node_GPU() { }
-			public int nAT = -1;		//node Activation Type		// 0 is classic. 1 is neural
 			public int ID = -1;			//Identification code		// The ID of this node
 			
-			public double tT = 0;		//trigger Threshold 		// Minimum amount of input before triggering
-			public double pTT = 0;		//previous Trigger Threshold
-			public double tS = 0;		//trigger Strength  		// Strength of the output transmition
-			public double pTS = 0;		//previous Trigger Strength
+			public double nTT = 0;		//Node trigger typeof		// 0 is step, 1 is sigmoid
+			public double nB = 0;		//Node bias
+			public double pNB = 0;		//Previous node bias
 			
 			public bool nII = false; 	//node Is Input				// Is the node is an input or not
 			public bool nIO = false; 	//node Is Output			// Is the node is an output or not
@@ -675,12 +673,20 @@ namespace CryptoAI {
 				//Now that we have the genome array filled in, we fill in the node array
 				for (int n = 0; n < CPU_Net.genomes[g].nodes.Length; n++) {
 					Node_GPU N = new Node_GPU();
-					N.nAT = 				CPU_Net.genomes[g].nodes[n].NodeActivationType.ToLower()[0];
+					string tmpStr = CPU_Net.genomes[g].nodes[n].NodeActivationType.ToLower();
+					if (tmpStr == "step")
+						N.nTT = 0;
+					else if (tmpStr == "sigmoid")
+						N.nTT = 1;
+					else
+						N.nTT = -1;
 					N.ID = 					CPU_Net.genomes[g].nodes[n].ID;
-					N.tT = 					CPU_Net.genomes[g].nodes[n].tT;
-					N.pTT = 				CPU_Net.genomes[g].nodes[n].tT;
-					N.tS = 					CPU_Net.genomes[g].nodes[n].tS;
-					N.pTS = 				CPU_Net.genomes[g].nodes[n].tS;
+					//N.tT = 					CPU_Net.genomes[g].nodes[n].tT;
+					//N.pTT = 				CPU_Net.genomes[g].nodes[n].tT;
+					//N.tS = 					CPU_Net.genomes[g].nodes[n].tS;
+					//N.pTS = 				CPU_Net.genomes[g].nodes[n].tS;
+					N.nB = 					AI_Internal_Core.getRandomFloat();
+					N.pNB =					N.nB;
 					N.nII = 				CPU_Net.genomes[g].nodes[n].nII;
 					N.nIO = 				CPU_Net.genomes[g].nodes[n].nIO;
 					N.nIV = 				CPU_Net.genomes[g].nodes[n].nIV;
@@ -764,10 +770,10 @@ namespace CryptoAI {
 				//char[] genomeActivationTypes = new char[] { 'c','n' };
 				//int randomIndex = AI_Internal_Core.rand.Next(genomeActivationTypes.Length);
 				//NGPU.nodes[i].nAT = genomeActivationTypes[randomIndex];
-				NGPU.nodes[i].nAT = 0;
+				NGPU.nodes[i].nTT = 1;
 				
-				NGPU.nodes[i].tS = 1;//AI_Internal_Core.getRandomFloat();
-				NGPU.nodes[i].pTS = NGPU.nodes[i].tS;						// Previous Transmition Strength
+				NGPU.nodes[i].nB = AI_Internal_Core.getRandomFloat();	//Node Bias
+				NGPU.nodes[i].pNB = NGPU.nodes[i].pNB;
 				
 				int startOfGenome = (int)(totalNodeCountPerGenome * Math.Floor((double)NGPU.nodes[i].ID / (double)totalNodeCountPerGenome));
 				NGPU.nodes[i].nII = i < startOfGenome + inputNodes;
@@ -808,9 +814,6 @@ namespace CryptoAI {
 						NGPU.connections[pos].Prev_Weight = NGPU.connections[pos].Weight;
 					}
 				}
-				
-				NGPU.nodes[i].tT = 0;//(NGPU.nodes[i].wEI-NGPU.nodes[i].wSI)*AI_Internal_Core.getRandomFloat();
-				NGPU.nodes[i].pTT = NGPU.nodes[i].tT;						// Previous Transmition Threshold
 			}
 			
 			TrimNetwork();
@@ -925,6 +928,8 @@ namespace CryptoAI {
 				}
 			}
 			
+			double Exp(double x) { return Math.Pow(Math.E,x); }
+			
 			void CalculateNodeOutput(int ID) {
 				int genomePos = GetGenomeIndex(ID);
 				
@@ -949,15 +954,17 @@ namespace CryptoAI {
 				//Just handle the exception where SOMEHOW our output value ends up being EXACTLY the same as the error value
 				if (result == -99999) { result += 0.00001; }
 				
-				if (nodes[ID].nAT == 0) {
-					nodes[ID].pO = result/(nodes[ID].wEI - nodes[ID].wSI);
-				} else if (nodes[ID].nAT == 1) {
-					if (result >= nodes[ID].tT) {
-						nodes[ID].pO = nodes[ID].tS;
-					} else {
-						nodes[ID].pO = 0;
-					}
-				}
+				if (nodes[ID].nTT == 0)
+					nodes[ID].pO = (result > 0) ? 0 : 1;  						// Step Function
+				else if (nodes[ID].nTT == 1)
+					nodes[ID].pO = 1 / (1 + Exp(-result)); 						// Sigmoid
+				else if (nodes[ID].nTT == 2)
+					nodes[ID].pO = (Exp(2*result) - 1) / (Exp(2 * result) + 1); // Hyperbolic Tangent
+				else if (nodes[ID].nTT == 3)
+					nodes[ID].pO = result / (1 + Exp(-result)); 				// SiLU
+				else if (nodes[ID].nTT == 2)
+					nodes[ID].pO = Math.Max(0, result); 						// ReLU
+				
 				
 				//Is the node an output? If so, we must put our result into the output array of the GPU
 				//W.I.P WHY DOES THIS NOT EVER TRIGGER?!?!?!?!?!?!?
@@ -979,17 +986,25 @@ namespace CryptoAI {
 			void RollbackAndAdjustWeight(int nodeID) {
 				int genIndex = GetGenomeIndex(nodeID);
 				if (genomes[genIndex].fitness < genomes[genIndex].prev_fitness) {
-					nodes[nodeID].tT = nodes[nodeID].pTT;
-					nodes[nodeID].tS = nodes[nodeID].pTS;
+					nodes[nodeID].nB = nodes[nodeID].pNB;
+					for (int i = nodes[nodeID].wSI; i <= nodes[nodeID].wEI; i++) {
+						nodeConnections[i].Weight = nodeConnections[i].Prev_Weight;
+					}
 				}
 				
 				nodes[nodeID].pO = -99999;
 				
-				double adjustmentVar = 0.1;
-				nodes[nodeID].pTT = nodes[nodeID].tT;
-				nodes[nodeID].tT = clamp(nodes[nodeID].tT + (GetRandomFloat(nodeID) * adjustmentVar * 2 - adjustmentVar),0,1);
-				nodes[nodeID].pTS = nodes[nodeID].tS;
-				nodes[nodeID].tS = 1; clamp(nodes[nodeID].tS + (GetRandomFloat(nodeID) * adjustmentVar * 2 - adjustmentVar),0,1);
+				double adjustmentVar = 0.05;
+				nodes[nodeID].pNB = nodes[nodeID].nB;
+				nodes[nodeID].nB += GetRandomFloat(nodeID) * adjustmentVar * 2 - adjustmentVar;
+				for (int i = nodes[nodeID].wSI; i <= nodes[nodeID].wEI; i++) {
+					nodeConnections[i].Prev_Weight = nodeConnections[i].Weight;
+					nodeConnections[i].Weight = clamp(
+						nodeConnections[i].Weight + (
+							GetRandomFloat(nodeID) * adjustmentVar * 2 - adjustmentVar
+						),-1,1
+					);
+				}
 			}
 			
 			int GetGenomeIndex(int nodeID) { return (int)Math.Floor((float)((double)genomes.Length * (double)nodeID / (double)nodes.Length)); }
