@@ -928,7 +928,7 @@ namespace CryptoAI {
 				}
 			}
 			
-			double Exp(double x) { return Math.Pow(Math.E,x); }
+			double Exp(double x) { return (double)Math.Pow(Math.E,(float)x); }
 			
 			void CalculateNodeOutput(int ID) {
 				int genomePos = GetGenomeIndex(ID);
