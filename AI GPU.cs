@@ -539,6 +539,8 @@ namespace CryptoAI {
 					inputsCount++;
 				if (NGPU.nodes[i].nIO)
 					outputsCount++;
+				if (NGPU.nodes[i].nII && NGPU.nodes[i].nIO)
+					Log.Error("","NETWORK MALFUNCTION! Network detected duplicate input/output topology!");
 			}
 			
 			outputsCount *= NGPU.genomes.Length;
@@ -584,6 +586,8 @@ namespace CryptoAI {
 					inputsCount++;
 				if (NGPU.nodes[i].nIO)
 					outputsCount++;
+				if (NGPU.nodes[i].nII && NGPU.nodes[i].nIO)
+					Log.Error("","NETWORK ERROR! Network detected duplicate input/output node");
 			}
 			
 			outputsCount *= NGPU.genomes.Length;
@@ -618,9 +622,14 @@ namespace CryptoAI {
 			));
 			
 			nBuff.CopyTo(NGPU.nodes);
+			//for(int i = 0; i < NGPU.nodes.Length; i++) {
 			for(int i = 0; i < NGPU.nodes.Length; i++) {
 				if (NGPU.nodes[i].nIO)
 					Console.WriteLine("Output node: " + NGPU.nodes[i].ID);
+				//if (NGPU.nodes[i].nII)
+				//	Console.WriteLine("Input node: " + NGPU.nodes[i].ID);
+				if (NGPU.nodes[i].nII && NGPU.nodes[i].nIO)
+					Log.Error("","NETWORK ERROR! Network detected duplicate input/output node");
 			}
 			
 			outputsBuff.CopyTo(outputsArray);
@@ -644,6 +653,8 @@ namespace CryptoAI {
 		}
 		
 		public void Convert_CPU_Network_To_GPU_Network(Network CPU_Net) {
+			throw new Exception("This function is no longer valid, as GPU AI node has been upgraded, while CPU AI node has not!");
+			
 			//Set up the array variables
 			int nodeCount = 0;
 			int connectionsCount = 0;
@@ -681,10 +692,6 @@ namespace CryptoAI {
 					else
 						N.nTT = -1;
 					N.ID = 					CPU_Net.genomes[g].nodes[n].ID;
-					//N.tT = 					CPU_Net.genomes[g].nodes[n].tT;
-					//N.pTT = 				CPU_Net.genomes[g].nodes[n].tT;
-					//N.tS = 					CPU_Net.genomes[g].nodes[n].tS;
-					//N.pTS = 				CPU_Net.genomes[g].nodes[n].tS;
 					N.nB = 					AI_Internal_Core.getRandomFloat();
 					N.pNB =					N.nB;
 					N.nII = 				CPU_Net.genomes[g].nodes[n].nII;
@@ -863,7 +870,6 @@ namespace CryptoAI {
 			public void Execute() {
 				if (nodes[ThreadIds.X].nIO)
 					genomeOutputs[2] = 2;
-				return;
 				
 				if (isTraining == false) {
 					CalculateNodeOutput(ThreadIds.X);
@@ -932,6 +938,7 @@ namespace CryptoAI {
 			
 			void CalculateNodeOutput(int ID) {
 				int genomePos = GetGenomeIndex(ID);
+				genomeOutputs[5] = 95;
 				
 				//If we are an input node, take the value from the inputs array
 				if (nodes[ID].nII) {
@@ -950,9 +957,6 @@ namespace CryptoAI {
 					while (nodes[prevNodeIndex].pO == -99999) {}
 					result += nodes[prevNodeIndex].pO * nodeConnections[i].Weight;
 				}
-				
-				//Just handle the exception where SOMEHOW our output value ends up being EXACTLY the same as the error value
-				if (result == -99999) { result += 0.00001; }
 				
 				if (nodes[ID].nTT == 0)
 					nodes[ID].pO = (result > 0) ? 0 : 1;  						// Step Function
