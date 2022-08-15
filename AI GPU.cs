@@ -622,7 +622,6 @@ namespace CryptoAI {
 			));
 			
 			nBuff.CopyTo(NGPU.nodes);
-			//for(int i = 0; i < NGPU.nodes.Length; i++) {
 			for(int i = 0; i < NGPU.nodes.Length; i++) {
 				if (NGPU.nodes[i].nIO)
 					Console.WriteLine("Output node: " + NGPU.nodes[i].ID);
