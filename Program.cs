@@ -37,7 +37,7 @@ namespace CryptoAI {
 			AI_GPU AI = new AI_GPU();
 			AI_GPU.saveDirectory = desktop + "Andrey AI/";
 			
-			AI.NewNetworkGPU(100,150,300,6,2);
+			AI.NewNetworkGPU(100,150,100,4,2);
 			AI_GPU.trainingData = API.allCoinsData;
 			List<double[]> results = AI.GetNetworkOutput(AI_GPU.trainingData[0]);
 			//for(int i = 0; i < results.Count; i++) {

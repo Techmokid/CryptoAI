@@ -581,7 +581,8 @@ namespace CryptoAI {
 		public List<double[]> GetNetworkOutput(double[] inputs) {
 			int inputsCount = 0;
 			int outputsCount = 0;
-			for(int i = NGPU.genomes[0].Nodes_Start_Index; i <= NGPU.genomes[0].Nodes_End_Index; i++) {
+			//for(int i = NGPU.genomes[0].Nodes_Start_Index; i <= NGPU.genomes[0].Nodes_End_Index; i++) {
+			for(int i = 0; i < NGPU.nodes.Length; i++) {
 				if (NGPU.nodes[i].nII)
 					inputsCount++;
 				if (NGPU.nodes[i].nIO)
@@ -621,10 +622,11 @@ namespace CryptoAI {
 				false
 			));
 			
+			NGPU.nodes = new Node_GPU[NGPU.nodes.Length];
 			nBuff.CopyTo(NGPU.nodes);
 			for(int i = 0; i < NGPU.nodes.Length; i++) {
-				if (NGPU.nodes[i].nIO)
-					Console.WriteLine("Output node: " + NGPU.nodes[i].ID);
+				//if (NGPU.nodes[i].nIO)
+				//	Console.WriteLine("Output node: " + NGPU.nodes[i].ID);
 				//if (NGPU.nodes[i].nII)
 				//	Console.WriteLine("Input node: " + NGPU.nodes[i].ID);
 				if (NGPU.nodes[i].nII && NGPU.nodes[i].nIO)
@@ -632,7 +634,8 @@ namespace CryptoAI {
 			}
 			
 			outputsBuff.CopyTo(outputsArray);
-			for(int i = 0; i < outputsArray.Length; i++) {
+			//for(int i = 0; i < outputsArray.Length; i++) {
+			for(int i = 0; i < 10; i++) {
 				Console.WriteLine("Output: " + outputsArray[i]);
 			}
 			
@@ -869,6 +872,7 @@ namespace CryptoAI {
 			public void Execute() {
 				if (nodes[ThreadIds.X].nIO)
 					genomeOutputs[2] = 2;
+				return;
 				
 				if (isTraining == false) {
 					CalculateNodeOutput(ThreadIds.X);
