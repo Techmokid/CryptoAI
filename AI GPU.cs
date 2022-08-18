@@ -34,6 +34,7 @@ namespace CryptoAI {
 		public static int numberOfIndexesPerThread = 10000;
 		public static List<double[]> trainingData = null;
 		public static double[] currentTrainingData = null;
+		public static bool useGPU = true;
 		static bool CPUIsReadyForCopying = false;
 		static bool GPUIsReady = false;
 		static bool once = false;
@@ -535,10 +536,10 @@ namespace CryptoAI {
 			int inputsCount = 0;
 			int outputsCount = 0;
 			for(int i = NGPU.genomes[0].Nodes_Start_Index; i <= NGPU.genomes[0].Nodes_End_Index; i++) {
-				if (NGPU.nodes[i].nII)
-					inputsCount++;
 				if (NGPU.nodes[i].nIO)
 					outputsCount++;
+				if (NGPU.nodes[i].nII)
+					inputsCount++;
 				if (NGPU.nodes[i].nII && NGPU.nodes[i].nIO)
 					Log.Error("","NETWORK MALFUNCTION! Network detected duplicate input/output topology!");
 			}
@@ -552,6 +553,8 @@ namespace CryptoAI {
 			using ReadWriteBuffer<Node_GPU> nBuff = GraphicsDevice.Default.AllocateReadWriteBuffer(NGPU.nodes);
 			using ReadWriteBuffer<NodeConnection_GPU> cBuff = GraphicsDevice.Default.AllocateReadWriteBuffer(NGPU.connections);
 			
+			// For training data, the AI uses "inputsBuff" as a counter for the number of input nodes.
+			// For standard network output, the AI uses "inputsBuff" as the network inputs to analyze.
 			using ReadWriteBuffer<double> inputsBuff = GraphicsDevice.Default.AllocateReadWriteBuffer(inputsArray);
 			using ReadWriteBuffer<double> outputsBuff = GraphicsDevice.Default.AllocateReadWriteBuffer(outputsArray);
 			
@@ -579,12 +582,10 @@ namespace CryptoAI {
 		}
 		
 		public List<double[]> GetNetworkOutput(double[] inputs) {
-			int inputsCount = 0;
 			int outputsCount = 0;
 			//for(int i = NGPU.genomes[0].Nodes_Start_Index; i <= NGPU.genomes[0].Nodes_End_Index; i++) {
+			
 			for(int i = 0; i < NGPU.nodes.Length; i++) {
-				if (NGPU.nodes[i].nII)
-					inputsCount++;
 				if (NGPU.nodes[i].nIO)
 					outputsCount++;
 				if (NGPU.nodes[i].nII && NGPU.nodes[i].nIO)
@@ -594,49 +595,57 @@ namespace CryptoAI {
 			outputsCount *= NGPU.genomes.Length;
 			
 			Console.WriteLine("Pre Outputs: " + outputsCount);
-			double[] inputsArray = new double[inputsCount];
 			double[] outputsArray = new double[outputsCount];
 			
-			using ReadWriteBuffer<Genome_GPU> gBuff = GraphicsDevice.Default.AllocateReadWriteBuffer(NGPU.genomes);
-			using ReadWriteBuffer<Node_GPU> nBuff = GraphicsDevice.Default.AllocateReadWriteBuffer(NGPU.nodes);
-			using ReadWriteBuffer<NodeConnection_GPU> cBuff = GraphicsDevice.Default.AllocateReadWriteBuffer(NGPU.connections);
-			
-			using ReadWriteBuffer<double> inputsBuff = GraphicsDevice.Default.AllocateReadWriteBuffer(inputsArray);
-			using ReadWriteBuffer<double> outputsBuff = GraphicsDevice.Default.AllocateReadWriteBuffer(outputsArray);
-			
-			using ReadWriteBuffer<int> randOffsetBuff = GraphicsDevice.Default.AllocateReadWriteBuffer(new int[NGPU.nodes.Length]);
-			
-			using ReadWriteBuffer<double> trainingBuff = GraphicsDevice.Default.AllocateReadWriteBuffer(new double[1]);
-			
-			GraphicsDevice.Default.For(NGPU.nodes.Length, new GPU_AI_PerNode(
-				gBuff,
-				nBuff,
-				cBuff,
-				inputsBuff,
-				outputsBuff,
-				1,
-				(int)Math.Floor(1000000*AI_Internal_Core.getRandomFloat()),
-				NGPU.nodes.Length,
-				randOffsetBuff,
-				trainingBuff,
-				false
-			));
-			
-			NGPU.nodes = new Node_GPU[NGPU.nodes.Length];
-			nBuff.CopyTo(NGPU.nodes);
-			for(int i = 0; i < NGPU.nodes.Length; i++) {
-				//if (NGPU.nodes[i].nIO)
-				//	Console.WriteLine("Output node: " + NGPU.nodes[i].ID);
-				//if (NGPU.nodes[i].nII)
-				//	Console.WriteLine("Input node: " + NGPU.nodes[i].ID);
-				if (NGPU.nodes[i].nII && NGPU.nodes[i].nIO)
-					Log.Error("","NETWORK ERROR! Network detected duplicate input/output node");
-			}
-			
-			outputsBuff.CopyTo(outputsArray);
-			//for(int i = 0; i < outputsArray.Length; i++) {
-			for(int i = 0; i < 10; i++) {
-				Console.WriteLine("Output: " + outputsArray[i]);
+			if (useGPU) {
+				using ReadWriteBuffer<Genome_GPU> gBuff = GraphicsDevice.Default.AllocateReadWriteBuffer(NGPU.genomes);
+				using ReadWriteBuffer<Node_GPU> nBuff = GraphicsDevice.Default.AllocateReadWriteBuffer(NGPU.nodes);
+				using ReadWriteBuffer<NodeConnection_GPU> cBuff = GraphicsDevice.Default.AllocateReadWriteBuffer(NGPU.connections);
+				
+				// For training data, the AI uses "inputsBuff" as a counter for the number of input nodes.
+				// For standard network output, the AI uses "inputsBuff" as the network inputs to analyze.
+				using ReadWriteBuffer<double> inputsBuff = GraphicsDevice.Default.AllocateReadWriteBuffer(inputs);
+				using ReadWriteBuffer<double> outputsBuff = GraphicsDevice.Default.AllocateReadWriteBuffer(outputsArray);
+				
+				using ReadWriteBuffer<int> randOffsetBuff = GraphicsDevice.Default.AllocateReadWriteBuffer(new int[NGPU.nodes.Length]);
+				
+				double[] tempTrainingData = new double[300];
+				tempTrainingData[299] = 5;
+				using ReadWriteBuffer<double> trainingBuff = GraphicsDevice.Default.AllocateReadWriteBuffer(tempTrainingData);
+				
+				GraphicsDevice.Default.For(NGPU.nodes.Length, new GPU_AI_PerNode(
+					gBuff,
+					nBuff,
+					cBuff,
+					inputsBuff,
+					outputsBuff,
+					1,
+					(int)Math.Floor(1000000*AI_Internal_Core.getRandomFloat()),
+					NGPU.nodes.Length,
+					randOffsetBuff,
+					trainingBuff,
+					false
+				));
+				
+				NGPU.nodes = new Node_GPU[NGPU.nodes.Length];
+				nBuff.CopyTo(NGPU.nodes);
+				for(int i = 0; i < NGPU.nodes.Length; i++) {
+					//if (NGPU.nodes[i].nIO)
+					//	Console.WriteLine("Output node: " + NGPU.nodes[i].ID);
+					//if (NGPU.nodes[i].nII)
+					//	Console.WriteLine("Input node: " + NGPU.nodes[i].ID);
+					if (NGPU.nodes[i].nII && NGPU.nodes[i].nIO)
+						Log.Error("","NETWORK ERROR! Network detected duplicate input/output node");
+				}
+				
+				outputsBuff.CopyTo(outputsArray);
+				//for(int i = 0; i < outputsArray.Length; i++) {
+				for(int i = 0; i < 10; i++) {
+					Console.WriteLine("Output: " + outputsArray[i]);
+				}
+			} else {
+				// Use the CPU instead of the GPU for calculating the output of the network
+				
 			}
 			
 			//Split the outputsBuff array into a list of smaller "double" arrays
@@ -655,7 +664,7 @@ namespace CryptoAI {
 		}
 		
 		public void Convert_CPU_Network_To_GPU_Network(Network CPU_Net) {
-			throw new Exception("This function is no longer valid, as GPU AI node has been upgraded, while CPU AI node has not!");
+			throw new Exception("CPU to GPU conversion no longer valid!");
 			
 			//Set up the array variables
 			int nodeCount = 0;
@@ -866,19 +875,24 @@ namespace CryptoAI {
 			
 			public readonly ReadWriteBuffer<int> randomOffset;
 			
-			public readonly ReadWriteBuffer<double> incomingTrainingData;
+			public readonly ReadWriteBuffer<double> trainingDataArray;
 			public readonly bool isTraining;
 			
 			public void Execute() {
-				if (nodes[ThreadIds.X].nIO)
-					genomeOutputs[2] = 2;
-				return;
+				if (nodes[ThreadIds.X].nIO) {
+					//W.I.P WHY DOES THIS NOT EVER TRIGGER?!?!?!?!?!?!?
+					genomeOutputs[2] = 5;
+				} else {
+					genomeOutputs[1] = 2;
+				}
 				
+				return;
 				if (isTraining == false) {
 					CalculateNodeOutput(ThreadIds.X);
 					return;
 				}
 				
+				int randomMarketDataTicker = 0;
 				double fakeCoins = 0;
 				double fakeWallet = 1000;
 				double fakeTotal = 1000;
@@ -887,10 +901,10 @@ namespace CryptoAI {
 				int genomeInputsStart = genomes[GetGenomeIndex(ThreadIds.X)].Nodes_Start_Index;
 				int outputsPerGenome = genomeOutputs.Length/genomes.Length;
 				for(int iteration = 0; iteration < numberOfIterations; iteration++) {
-					for(int trainingDataIndex = 0; trainingDataIndex < incomingTrainingData.Length - genomeInputs.Length; trainingDataIndex++) {
+					for(int trainingDataIndex = 0; trainingDataIndex < trainingDataArray.Length - genomeInputs.Length; trainingDataIndex++) {
 						if (nodes[ThreadIds.X].nII) {
 							//Set the training data to the node input here
-							nodes[ThreadIds.X].nIV = incomingTrainingData[trainingDataIndex + ThreadIds.X - genomeInputsStart];
+							nodes[ThreadIds.X].nIV = trainingDataArray[trainingDataIndex + ThreadIds.X - genomeInputsStart];
 							nodes[ThreadIds.X].pO = 1;//nodes[ThreadIds.X].nIV;
 						}
 						
@@ -912,14 +926,17 @@ namespace CryptoAI {
 						if (ThreadIds.X == genomeInputsStart) {
 							int outputPos = GetGenomeIndex(ThreadIds.X) * outputsPerGenome;
 							if ((genomeOutputs[outputPos] > 0) && (fakeCoins > 0)) {
-								fakeWallet = fakeCoins * incomingTrainingData[trainingDataIndex] * (1 - networkSellTax);		//Sell
+								fakeWallet = fakeCoins * trainingDataArray[trainingDataIndex] * (1 - networkSellTax);		//Sell
 								fakeCoins = 0;
 							}
 							
 							if ((genomeOutputs[outputPos + 1] > 0) && (fakeWallet > 0)) {
-								fakeCoins = fakeWallet / incomingTrainingData[trainingDataIndex];		//Buy
+								fakeCoins = fakeWallet / trainingDataArray[trainingDataIndex];		//Buy
 								fakeWallet = 0;
 							}
+							
+							randomMarketDataTicker++;
+							UpdateFakeMarketData(randomMarketDataTicker, ThreadIds.X);
 						}
 						
 						//Synchronise all threads so that the nodes don't start calculating asychronously and causing havoc in memory
@@ -928,13 +945,40 @@ namespace CryptoAI {
 							while(nodes[genomeInputsStart + i].pO != -99999) {}
 						}
 						
-						fakeTotal += fakeWallet + fakeCoins*incomingTrainingData[trainingDataIndex + genomeInputs.Length];
+						fakeTotal += fakeWallet + fakeCoins*trainingDataArray[trainingDataIndex + genomeInputs.Length];
 					}
 					
 					//genomes[GetGenomeIndex(ThreadIds.X)].fitness = genomeOutputs[GetGenomeIndex(ThreadIds.X) * outputsPerGenome];//fakeTotal;
 					genomes[GetGenomeIndex(ThreadIds.X)].fitness = fakeTotal;
 					RollbackAndAdjustWeight(ThreadIds.X);
 				}
+			}
+			
+			void UpdateFakeMarketData(int ticker, int ID) {
+				for (int i = 0; i < trainingDataArray.Length - 1; i++) {
+					trainingDataArray[i] = trainingDataArray[i + 1];
+				}
+				
+				// This follows a specific type of random number generation that I've proven via python works
+				double oldPrice = trainingDataArray[trainingDataArray.Length-1];
+				double MIN_PRICE = 0.1;
+				double MAX_PRICE = 9.9;
+				
+				double volatility = 8;
+				double changePercent = 2 * volatility * GetRandomFloat(ID);
+				
+				if (changePercent > volatility)
+					changePercent -= (2 * volatility);
+				
+				double changeAmount = oldPrice * changePercent/100;
+				double newPrice = oldPrice + changeAmount;
+				
+				if (newPrice < MIN_PRICE)
+					newPrice += Math.Abs(changeAmount) * 2;
+				else if (newPrice > MAX_PRICE)
+					newPrice -= Math.Abs(changeAmount) * 2;
+				
+				trainingDataArray[trainingDataArray.Length-1] = newPrice;
 			}
 			
 			double Exp(double x) { return (double)Math.Pow(Math.E,(float)x); }
@@ -972,12 +1016,8 @@ namespace CryptoAI {
 				else if (nodes[ID].nTT == 2)
 					nodes[ID].pO = Math.Max(0, result); 						// ReLU
 				
-				
 				//Is the node an output? If so, we must put our result into the output array of the GPU
-				//W.I.P WHY DOES THIS NOT EVER TRIGGER?!?!?!?!?!?!?
-				genomeOutputs[1] = 1;
 				if (nodes[ID].nIO) {
-					genomeOutputs[2] = 2;
 					int outputsPerGenome = genomeOutputs.Length/genomes.Length;
 					//int outputArrayStartPos = outputsPerGenome*genomePos;
 					//int outputArrayEndPos = (outputsPerGenome + 1)*genomePos - 1;
@@ -985,7 +1025,7 @@ namespace CryptoAI {
 					int outputNodesIndexStart = genomeNodesEnd - outputsPerGenome + 1;
 					int outputNodeIndex = outputsPerGenome*genomePos + ID - outputNodesIndexStart;
 					
-					//genomeOutputs[outputsPerGenome] = GetRandomFloat(ID);//result;
+					genomeOutputs[outputsPerGenome] = nodes[ID].pO;
 				}
 				
 			}
