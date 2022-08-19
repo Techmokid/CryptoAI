@@ -265,7 +265,7 @@ namespace CryptoAI {
 				while(!CPUIsReadyForCopying) {
 					for(int i = 0; i < trainingData.Count; i++) {
 						currentTrainingData = trainingData[i];
-						TrainNetwork(10000);
+						TrainNetwork(100000);
 						
 						double worstFitness = double.PositiveInfinity;
 						double bestFitness = double.NegativeInfinity;
@@ -881,11 +881,13 @@ namespace CryptoAI {
 			public void Execute() {
 				if (nodes[ThreadIds.X].nIO) {
 					//W.I.P WHY DOES THIS NOT EVER TRIGGER?!?!?!?!?!?!?
-					genomeOutputs[2] = 5;
+					genomeOutputs[6] = 81;
 				} else {
 					genomeOutputs[1] = 2;
 				}
-				
+				while(true){
+					if (genomeOutputs[7] == 91) {break;}
+				}
 				return;
 				if (isTraining == false) {
 					CalculateNodeOutput(ThreadIds.X);

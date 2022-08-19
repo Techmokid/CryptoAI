@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading;
 using System.Collections.Generic;
+using Microsoft.Win32;
 
 using BasicAlgorithm;
 using Binance_API;
@@ -10,6 +11,7 @@ using NI = CryptoAI.NetworkInterface;
 namespace CryptoAI {
 	public class Program {
 		static string desktop = "C:/Users/aj200/Desktop/";
+		static int secondsToGPUFailure = 60*60*24;
 		
 		static void Main(string[] args) {
 			Console.Clear();
@@ -30,6 +32,25 @@ namespace CryptoAI {
 			
 			//DisplayManager.StartDisplay();
 			Log.Print("CryptoAI","Starting...");
+			
+			try {
+				RegistryKey key = Registry.LocalMachine.OpenSubKey("SYSTEM\\CurrentControlSet\\Control\\GraphicsDrivers", true);
+				try {
+					if(key.GetValue("TdrDelay").ToString() != secondsToGPUFailure.ToString()) {
+						Log.Print("CryptoAI","GPU timeout variable different to requested value. Editing TdrDelay registry calue");
+						key.SetValue("TdrDelay", secondsToGPUFailure.ToString(), RegistryValueKind.DWord);
+						Log.Success("CryptoAI","Registry modified!");
+					}
+				} catch {
+					Log.Print("CryptoAI","GPU timeout variable not created. Creating registry value");
+					key.SetValue("TdrDelay", secondsToGPUFailure.ToString(), RegistryValueKind.DWord);
+					Log.Success("CryptoAI","Registry value created!");
+				}
+				key.Close();
+			} catch {
+				Log.Warning("CryptoAI","Could not read registry. If GPU times out, please run this application as administrator");
+			}
+			
 			Log.Print("CryptoAI","Retrieving crypto data....");
 			API.UpdateAllCoinsData(300);
 			Log.Success("CryptoAI","Retrieved all crypto data");
