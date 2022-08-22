@@ -59,6 +59,7 @@ namespace CryptoAI {
 			
 			public bool nII = false; 	//node Is Input				// Is the node is an input or not
 			public bool nIO = false; 	//node Is Output			// Is the node is an output or not
+			public bool tNIO = false;	//node temporary output		// For some reason, nIO is not being read correctly on the GPU. This is the fix?
 			public double nIV = 0;		//node Input Value			// If the node is an input, what have we entered
 			public double pO = -99999;	//precalculated Output		// This variable just allows for quicker genome output computing
 			
@@ -586,8 +587,10 @@ namespace CryptoAI {
 			//for(int i = NGPU.genomes[0].Nodes_Start_Index; i <= NGPU.genomes[0].Nodes_End_Index; i++) {
 			
 			for(int i = 0; i < NGPU.nodes.Length; i++) {
-				if (NGPU.nodes[i].nIO)
+				if (NGPU.nodes[i].nIO) {
 					outputsCount++;
+					NGPU.nodes[i].tNIO = true;
+				}
 				if (NGPU.nodes[i].nII && NGPU.nodes[i].nIO)
 					Log.Error("","NETWORK ERROR! Network detected duplicate input/output node");
 			}
@@ -634,8 +637,8 @@ namespace CryptoAI {
 					//	Console.WriteLine("Output node: " + NGPU.nodes[i].ID);
 					//if (NGPU.nodes[i].nII)
 					//	Console.WriteLine("Input node: " + NGPU.nodes[i].ID);
-					if (NGPU.nodes[i].nII && NGPU.nodes[i].nIO)
-						Log.Error("","NETWORK ERROR! Network detected duplicate input/output node");
+					if (NGPU.nodes[i].nII && NGPU.nodes[i].tNIO && NGPU.nodes[i].nIO)
+						Log.Error("","NETWORK ERROR 2! Network detected duplicate input/output node");
 				}
 				
 				outputsBuff.CopyTo(outputsArray);
@@ -879,21 +882,11 @@ namespace CryptoAI {
 			public readonly bool isTraining;
 			
 			public void Execute() {
-				if (nodes[ThreadIds.X].nIO) {
-					//W.I.P WHY DOES THIS NOT EVER TRIGGER?!?!?!?!?!?!?
-					genomeOutputs[6] = 81;
-				} else {
-					genomeOutputs[1] = 2;
-				}
-				while(true){
-					if (genomeOutputs[7] == 91) {break;}
-				}
-				return;
 				if (isTraining == false) {
 					CalculateNodeOutput(ThreadIds.X);
 					return;
 				}
-				
+				return;
 				int randomMarketDataTicker = 0;
 				double fakeCoins = 0;
 				double fakeWallet = 1000;
@@ -987,23 +980,22 @@ namespace CryptoAI {
 			
 			void CalculateNodeOutput(int ID) {
 				int genomePos = GetGenomeIndex(ID);
-				genomeOutputs[5] = 95;
 				
 				//If we are an input node, take the value from the inputs array
 				if (nodes[ID].nII) {
 					int i = ID - genomes[genomePos].Nodes_Start_Index;
 					nodes[ID].nIV = genomeInputs[i];
-					nodes[ID].pO = nodes[ID].nIV;
+					nodes[ID].pO = genomeInputs[i];
 					return;
 				}
-				
+				return;
 				//If we are not an input node, we have to calculate our output value based on the previous nodes
 				//All nodes are doing this simultaneously, so we just wait a moment until the nodes before us have finished, then we can give a response
 				//Yes yes, I know that pausing execution and waiting for something on the GPU is bad. This is my code, and if it works, it can't be that bad
 				double result = 0;
 				for (int i = nodes[ID].wSI; i <= nodes[ID].wEI; i++) {
 					int prevNodeIndex = nodeConnections[i].NodePos;
-					while (nodes[prevNodeIndex].pO == -99999) {}
+					//while (nodes[prevNodeIndex].pO == -99999) {}
 					result += nodes[prevNodeIndex].pO * nodeConnections[i].Weight;
 				}
 				
@@ -1015,11 +1007,11 @@ namespace CryptoAI {
 					nodes[ID].pO = (Exp(2*result) - 1) / (Exp(2 * result) + 1); // Hyperbolic Tangent
 				else if (nodes[ID].nTT == 3)
 					nodes[ID].pO = result / (1 + Exp(-result)); 				// SiLU
-				else if (nodes[ID].nTT == 2)
+				else if (nodes[ID].nTT == 4)
 					nodes[ID].pO = Math.Max(0, result); 						// ReLU
 				
 				//Is the node an output? If so, we must put our result into the output array of the GPU
-				if (nodes[ID].nIO) {
+				if (nodes[ID].tNIO) {
 					int outputsPerGenome = genomeOutputs.Length/genomes.Length;
 					//int outputArrayStartPos = outputsPerGenome*genomePos;
 					//int outputArrayEndPos = (outputsPerGenome + 1)*genomePos - 1;

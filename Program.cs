@@ -11,7 +11,7 @@ using NI = CryptoAI.NetworkInterface;
 namespace CryptoAI {
 	public class Program {
 		static string desktop = "C:/Users/aj200/Desktop/";
-		static int secondsToGPUFailure = 60*60*24;
+		static int secondsToGPUFailure = 2;//60*60*24;
 		
 		static void Main(string[] args) {
 			Console.Clear();
@@ -58,7 +58,7 @@ namespace CryptoAI {
 			AI_GPU AI = new AI_GPU();
 			AI_GPU.saveDirectory = desktop + "Andrey AI/";
 			
-			AI.NewNetworkGPU(100,150,100,4,2);
+			AI.NewNetworkGPU(1,150,100,4,2);
 			AI_GPU.trainingData = API.allCoinsData;
 			List<double[]> results = AI.GetNetworkOutput(AI_GPU.trainingData[0]);
 			//for(int i = 0; i < results.Count; i++) {
